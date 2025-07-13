@@ -1,4 +1,5 @@
 from fastapi import FastAPI, File, UploadFile, Request
+from typing import Optional
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
@@ -17,13 +18,13 @@ def get_upload_page(request: Request):
     return templates.TemplateResponse("upload.html", {"request": request})
 
 @app.post('/upload')
-async def upload(request: Request, file: UploadFile = File(...)):
-    contents = await file.read()
+async def upload(request: Request, new_owner_inkan: Optional[UploadFile] = File(None)):
+    if new_owner_inkan:
+        contents = await new_owner_inkan.read()
+        ocr_text = detect_text_from_image(contents)
+        structured_data = extract_structure_data_from_text(ocr_text, document_type="new_owner_inkan")
 
-    ocr_text = detect_text_from_image(contents)
-    structured_data = extract_structure_data_from_text(ocr_text)
-
-    print(f"アップロードファイル: {file.filename}")
+    print(f"アップロードファイル: {new_owner_inkan.filename}")
     print(f"OCR結果:\n{structured_data}")
 
     return templates.TemplateResponse("upload.html", {

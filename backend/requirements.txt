@@ -5,3 +5,6 @@ jinja2
 requests
 python-dotenv
 openai
+sqlalchemy
+mysql-connector-python
+cryptography

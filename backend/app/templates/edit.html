@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>データ編集</title>
+</head>
+<body>
+    <h1>データ編集</h1>
+
+    <form method="post">
+        <label>新所有者氏名</label><br>
+        <input type="text" name="new_owner_name" value="{{ ocr.new_owner_name }}"><br>
+
+        <label>住所</label><br>
+        <input type="text" name="new_owner_address_main" value="{{ ocr.new_owner_address_main }}"><br>
+
+        <label>丁目</label><br>
+        <input type="text" name="new_owner_address_street" value="{{ ocr.new_owner_address_street }}"><br>
+
+        <label>番地</label><br>
+        <input type="text" name="new_owner_address_number" value="{{ ocr.new_owner_address_number }}"><br>
+
+        <button type="submit">更新</button>
+    </form>
+
+    <p><a href="/list/{{ ocr.user_id }}">一覧へ戻る</a></p>
+</body>
+</html>

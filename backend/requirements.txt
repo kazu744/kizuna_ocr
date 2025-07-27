@@ -8,3 +8,4 @@ openai
 sqlalchemy
 mysql-connector-python
 cryptography
+openpyxl

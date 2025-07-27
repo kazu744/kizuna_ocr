@@ -1,0 +1,61 @@
+{% extends 'layout.html' %}
+
+{% block title%}登録情報取得一覧{% endblock %}
+
+{% block header %}
+登録情報取得一覧
+{% endblock %}
+
+{% block content %}
+    {% if ocrs %}
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>ユーザー名</th>
+                <th>新所有者名</th>
+                <th>新所有者住所</th>
+                <th>新所有者丁目</th>
+                <th>新所有者番地</th>
+                <th>作成日時</th>
+                <th>更新日時</th>
+                <th>削除</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ocr in ocrs %}
+                <tr>
+                    <td><a href="/edit/{{ ocr.id }}">{{ ocr.id }}</a></td>
+                    <td>{{ ocr.user_id }}</td>
+                    <td>{{ ocr.new_owner_name }}</td>
+                    <td>{{ ocr.new_owner_address_main }}</td>
+                    <td>{{ ocr.new_owner_address_street }}</td>
+                    <td>{{ ocr.new_owner_address_number }}</td>
+                    <td>{{ ocr.created_at }}</td>
+                    <td>{{ ocr.updated_at }}</td>
+                    <td><button onclick="deleteOcr('{{ ocr.id }}')">削除</button></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    {% endif%}
+
+    <script>
+        async function deleteOcr(ocrId) {
+            if (!confirm("本当に削除してもよろしいですか？")) return;
+    
+            const response = await fetch(`/api/ocr/${ocrId}`,{
+                method: "DELETE"
+            });
+    
+            if (response.status === 204) {
+                location.reload();
+            } else if (response.status === 404) {
+                alert("対象データが見つかりませんでした。")
+            } else {
+                alert("削除に失敗しました。")
+            }
+        }
+    </script>
+
+{% endblock%}
+

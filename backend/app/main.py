@@ -1,4 +1,4 @@
-from fastapi import FastAPI, File, UploadFile, Request
+from fastapi import FastAPI, File, UploadFile, Request, Form, Response
 from typing import Optional
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
@@ -46,3 +46,46 @@ async def upload(request: Request, new_owner_inkan: Optional[UploadFile] = File(
         "request": request,
         "structured_data": structured_data
     })
+
+@app.get('/list/{user_id}')
+def show_list(request: Request, user_id: int):
+    ocrs = Ocr.get_by_user(user_id=user_id)
+    return templates.TemplateResponse("list.html", {
+        "request": request,
+        "ocrs": ocrs
+        })
+    
+@app.get("/edit/{ocr_id}", response_class=HTMLResponse)
+def get_edit_list(request: Request, ocr_id: int):
+    ocr = Ocr.get_by_id(ocr_id)
+    return templates.TemplateResponse("edit.html", {"request": request, "ocr": ocr})
+
+@app.post("/edit/{ocr_id}")
+async def update_ocr(
+    ocr_id: int, 
+    new_owner_name: str = Form(...),
+    new_owner_address_main: str = Form(...),
+    new_owner_address_street: str = Form(...),
+    new_owner_address_number: str = Form(...),
+    ):
+
+    updated_at = datetime.now()
+
+    ocr = Ocr.get_by_id(ocr_id)
+    ocr.update(
+        new_owner_name=new_owner_name,
+        new_owner_address_main=new_owner_address_main,
+        new_owner_address_street=new_owner_address_street,
+        new_owner_address_number=new_owner_address_number,
+        updated_at=updated_at,
+    )
+    return RedirectResponse(url=f"/list/{ocr.user_id}", status_code=303)
+
+
+@app.delete("/api/ocr/{ocr_id}")
+async def delete(ocr_id: int):
+    ocr = Ocr.get_by_id(ocr_id)
+    if not ocr:
+        return Response(status_code=404)
+    ocr.delete()
+    return Response(status_code=204)

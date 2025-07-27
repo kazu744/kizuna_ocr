@@ -1,6 +1,8 @@
 from fastapi import FastAPI, File, UploadFile, Request, Form, Response
-from typing import Optional
-from fastapi.responses import HTMLResponse, RedirectResponse
+from typing import Optional, List
+from fastapi.responses import HTMLResponse, RedirectResponse, StreamingResponse
+from openpyxl import Workbook
+from io import BytesIO
 from fastapi.templating import Jinja2Templates
 from datetime import datetime
 from app.model.Ocr import Ocr
@@ -89,3 +91,32 @@ async def delete(ocr_id: int):
         return Response(status_code=404)
     ocr.delete()
     return Response(status_code=204)
+
+@app.post("/export")
+async def export_select_ocr(ocr_ids: List[int] = Form(...)):
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "OCR出力"
+
+    ws.append(["ID", "新所有者名", "新所有者住所", "新所有者丁目", "新所有者番地"])
+
+    for ocr_id in ocr_ids:
+        ocr = Ocr.get_by_id(ocr_id)
+        if ocr:
+            ws.append([
+                ocr.id,
+                ocr.new_owner_name,
+                ocr.new_owner_address_main,
+                ocr.new_owner_address_street,
+                ocr.new_owner_address_number,
+            ])
+    
+    output = BytesIO()
+    wb.save(output)
+    output.seek(0)
+
+    return StreamingResponse(
+        output,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": "attachment; filename=ocr_export.xlsx"}
+    )

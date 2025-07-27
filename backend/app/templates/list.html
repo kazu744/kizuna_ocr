@@ -8,9 +8,11 @@
 
 {% block content %}
     {% if ocrs %}
+    <form action="/export" method="post">
     <table border="1">
         <thead>
             <tr>
+                <th><input type="checkbox" id="checksAll"></th>
                 <th>ID</th>
                 <th>ユーザー名</th>
                 <th>新所有者名</th>
@@ -25,6 +27,7 @@
         <tbody>
             {% for ocr in ocrs %}
                 <tr>
+                    <td><input type="checkbox" class="checks" name="ocr_ids" value="{{ ocr.id }}"></td>
                     <td><a href="/edit/{{ ocr.id }}">{{ ocr.id }}</a></td>
                     <td>{{ ocr.user_id }}</td>
                     <td>{{ ocr.new_owner_name }}</td>
@@ -38,6 +41,11 @@
             {% endfor %}
         </tbody>
     {% endif%}
+    </table>
+    <p><button type="submit">選択したデータをダウンロード</button></p>
+    </form>
+    
+    <p><a href=" /upload/">アップロード画面に戻る</a></p>
 
     <script>
         async function deleteOcr(ocrId) {
@@ -55,6 +63,28 @@
                 alert("削除に失敗しました。")
             }
         }
+    </script>
+
+    <script>
+        const checkall = document.getElementById("checksAll");
+        const checks = document.querySelectorAll(".checks");
+
+        checkall.addEventListener('click', () => {
+            for (val of checks) {
+                checkall.checked == true ? val.checked = true : val.checked = false;
+            }
+        });
+
+        checks.forEach(element => {
+            element.addEventListener('click', () => {
+                if (element.checked == false) {
+                    checkall.checked = false;
+                }
+                if (document.querySelectorAll(".checks:checked").length == checks.length) {
+                    checkall.checked = true;
+                }
+            });
+        });
     </script>
 
 {% endblock%}

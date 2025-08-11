@@ -1,6 +1,7 @@
 from fastapi import FastAPI, File, UploadFile, Request, Form, Response
 from typing import Optional, List
 from fastapi.responses import HTMLResponse, RedirectResponse, StreamingResponse
+from fastapi.middleware.cors import CORSMiddleware
 from openpyxl import Workbook
 from io import BytesIO
 from fastapi.templating import Jinja2Templates
@@ -13,6 +14,14 @@ from app.chatgpt.chatgpt import extract_structure_data_from_text
 app = FastAPI()
 templates = Jinja2Templates(directory="app/templates")
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 @app.get("/")
 def read_root():
     return {"message": "Hello World!"}
@@ -21,6 +30,11 @@ def read_root():
 def get_upload_page(request: Request):
     return templates.TemplateResponse("upload.html", {"request": request})
 
+@app.post("/upload")
+async def upload(new_owner_inkan: UploadFile = File(...)):
+    return {"ok": True, "data": {"filename": new_owner_inkan.filename}}
+
+"""
 @app.post('/upload')
 async def upload(request: Request, new_owner_inkan: Optional[UploadFile] = File(None)):
     if new_owner_inkan:
@@ -48,7 +62,7 @@ async def upload(request: Request, new_owner_inkan: Optional[UploadFile] = File(
         "request": request,
         "structured_data": structured_data
     })
-
+"""
 @app.get('/list/{user_id}')
 def show_list(request: Request, user_id: int):
     ocrs = Ocr.get_by_user(user_id=user_id)

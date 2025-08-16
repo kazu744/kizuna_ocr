@@ -1,4 +1,5 @@
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey
 from app.db.base import Base
@@ -26,6 +27,7 @@ class Ocr(Base):
             with SessionLocal() as session:
                 session.add(ocr_record)
                 session.commit()
+                session.refresh(ocr_record)
             return ocr_record
         except Exception as e:
             print(f"エラーが発生しました。{e}")
@@ -44,7 +46,7 @@ class Ocr(Base):
     def update(self, **kwargs):
         for key, value in kwargs.items():
             setattr(self, key, value)
-        self.updated_at = datetime.now()
+        self.updated_at = datetime.now(ZoneInfo('Asia/Tokyo'))
         print(f"[OCR UPDATE] ID: {self.id} が更新されました")
         try:
             with SessionLocal() as session:
@@ -55,7 +57,7 @@ class Ocr(Base):
 
 
     def delete(self):
-        self.deleted_at = datetime.now()
+        self.deleted_at = datetime.now(ZoneInfo('Asia/Tokyo'))
         try:
             with SessionLocal() as session:
                 session.merge(self)

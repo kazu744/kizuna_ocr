@@ -1,4 +1,22 @@
 services:
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      NEXT_TELEMETRY_DISABLED: "1"
+      CHOKIDAR_USEPOLLING: "true"
+      WATCHPACK_POLLING: "true"
+      HOST: "0.0.0.0"
+      NEXT_PUBLIC_API_BASE: "http://localhost:8001"
+    command: npm run dev
+    networks:
+      - app-network
+
   mysql:
     image: mysql:8.0
     restart: always

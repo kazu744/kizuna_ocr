@@ -122,7 +122,7 @@ export default function OcrListPage() {
                   onChange={() => toggleSelect(ocr.id)}
                   />
               </td>
-              <td><Link href={`/edit/${ocr.id}`}>{ocr.id}</Link></td>
+              <td><Link href={`/ocr_edit/${ocr.id}`}>{ocr.id}</Link></td>
               <td>{ocr.new_owner_name}</td>
               <td>{ocr.new_owner_address_main}</td>
               <td>{ocr.new_owner_address_street}</td>

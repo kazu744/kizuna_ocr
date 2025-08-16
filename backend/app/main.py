@@ -85,11 +85,20 @@ def api_get_ocr(user_id: int = Query(...)) -> List[dict]:
             "updated_at": ocr.updated_at,
         })
     return result
-    
-@app.get("/edit/{ocr_id}", response_class=HTMLResponse)
-def get_edit_list(request: Request, ocr_id: int):
+
+# 編集
+@app.get("/api/ocr/{ocr_id}")
+def get_edit_list(ocr_id: int):
     ocr = Ocr.get_by_id(ocr_id)
-    return templates.TemplateResponse("edit.html", {"request": request, "ocr": ocr})
+    if not ocr:
+        raise HTTPException(status_code=404, dtail="Not found")
+    return {
+        "id": ocr.id,
+        "new_owner_name": ocr.new_owner_name,
+        "new_owner_address_main": ocr.new_owner_address_main,
+        "new_owner_address_street": ocr.new_owner_address_street,
+        "new_owner_address_number": ocr.new_owner_address_number,
+    }
 
 @app.put("/api/ocr/{ocr_id}")
 async def update_ocr(
